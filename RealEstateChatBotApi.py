@@ -1,4 +1,4 @@
-from setting import api_key ,azure_endpoint ,api_version ,model
+from setting import api_key ,azure_endpoint ,api_version ,model , dataset_url
 import openai
 import pandas as pd
 import re
@@ -9,7 +9,7 @@ openai.api_base = azure_endpoint
 openai.api_version = api_version
 openai.api_key = api_key
 
-dataset_url = "uae_real_estate_2024.csv"
+
 dataset = pd.read_csv(dataset_url)
 
 dataset.columns = dataset.columns.str.strip()
