@@ -1,4 +1,4 @@
-from setting import api_key ,azure_endpoint ,api_version ,model , dataset_url
+from setting import api_key ,azure_endpoint ,api_version ,model , dataset_url ,column_mapping
 import openai
 import pandas as pd
 import re
@@ -14,14 +14,7 @@ dataset = pd.read_csv(dataset_url)
 
 dataset.columns = dataset.columns.str.strip()
 
-column_mapping = {
-    'bedrooms': 'bedrooms',
-    'bathrooms': 'bathrooms',
-    'displayAddress': 'displayAddress',
-    'price': 'price',
-    'sizeMin': 'sizeMin',
-    'furnishing': 'furnishing'
-}
+
 
 def extract_attributes(query):
     attributes = {

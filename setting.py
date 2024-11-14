@@ -3,3 +3,12 @@ azure_endpoint = "https://assessment.openai.azure.com/"
 api_version = "2024-10-21"
 model = "gpt-4"
 dataset_url = "uae_real_estate_2024.csv"
+
+column_mapping = {
+    'bedrooms': 'bedrooms',
+    'bathrooms': 'bathrooms',
+    'displayAddress': 'displayAddress',
+    'price': 'price',
+    'sizeMin': 'sizeMin',
+    'furnishing': 'furnishing'
+}
