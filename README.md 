@@ -1,0 +1,36 @@
+Overview:
+This chatbot provides a user-friendly interface to search for real estate properties in the UAE. It allows users to filter properties by attributes such as the number of bedrooms, bathrooms, price range, and location, using natural language input.
+
+Setup
+Install dependencies: Ensure you have the necessary libraries installed:
+
+bash
+Copy code
+pip install openai pandas streamlit
+Dataset: The chatbot works with the dataset uae_real_estate_2024.csv. Ensure the dataset is in the correct path.
+
+API Setup: The chatbot uses Azure OpenAI for querying. Set up your api_key, azure_endpoint, and other configurations in the RealEstateChatBotApi.py.
+
+Functionality
+Extract Attributes:
+The extract_attributes() function processes user input and extracts key attributes such as bedrooms, bathrooms, price, and location.
+
+Search Properties:
+The search_properties() function filters the dataset based on the extracted attributes and returns a list of properties that match the criteria.
+
+Format Results:
+The format_properties() function formats the matched properties for easy display.
+
+Streamlit UI:
+The interface uses Streamlit to display a chat interface, allowing users to interact with the chatbot. The user can enter queries, and the bot responds with filtered property suggestions.
+
+Usage
+User Interaction:
+The user enters a query, and the chatbot processes it to extract attributes. It then filters the dataset and displays matching properties.
+
+Search Example:
+A user might ask, "Show me 2-bedroom apartments in Dubai under 1 million AED," and the bot will return properties that meet the criteria.
+
+Customization
+You can modify the attribute extraction logic in RealEstateChatBotApi.py for more complex queries.
+The format_properties() function can be customized to display additional property details or change the response format.
