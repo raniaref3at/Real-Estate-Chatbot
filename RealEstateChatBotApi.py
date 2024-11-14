@@ -1,11 +1,8 @@
+from setting import api_key ,azure_endpoint ,api_version ,model
 import openai
 import pandas as pd
 import re
 
-api_key = "7uvNPwVoyFgg2xF2LqCF3CGcvEMTVEBwz0eduSlJOz7ssb7x5hMbJQQJ99AKACF24PCXJ3w3AAABACOGKpz3"
-azure_endpoint = "https://assessment.openai.azure.com/"
-api_version = "2024-10-21"
-model = "gpt-4"
 
 openai.api_type = "azure"
 openai.api_base = azure_endpoint
