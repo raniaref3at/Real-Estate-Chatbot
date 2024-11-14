@@ -67,7 +67,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Display the chat history
 def display_chat():
     st.markdown('<div class="chat-container">', unsafe_allow_html=True)
     st.markdown('<div class="chat-messages">', unsafe_allow_html=True)
@@ -78,19 +77,21 @@ def display_chat():
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-# Handle user input
+
+
 def handle_user_input():
     with st.form(key="chat_form", clear_on_submit=True):
         user_input = st.text_input("Enter your message:", key="user_input_field", label_visibility="collapsed")
         submit_button = st.form_submit_button("Send", type="primary")
 
         if submit_button and user_input:
+            st.session_state.chat_history.append(f"You: {user_input}")
+            
             user_attributes = extract_attributes(user_input)
             matching_properties = search_properties(user_attributes, st.session_state.dataset)
             response = format_properties(matching_properties)
-            st.session_state.chat_history.append(f"You: {user_input}")
-            st.session_state.chat_history.append(f"Bot: {response}")
 
-# Call the functions
-display_chat()
+            st.session_state.chat_history.append(f"Bot: {response}")
+            display_chat()
+
 handle_user_input()
