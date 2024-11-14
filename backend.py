@@ -1,3 +1,4 @@
+import streamlit as st
 import openai
 import pandas as pd
 import re
@@ -8,6 +9,7 @@ azure_endpoint = "https://assessment.openai.azure.com/"
 api_version = "2024-10-21"
 model = "gpt-4"
 
+
 # Set up OpenAI client with Azure-specific configurations
 openai.api_type = "azure"
 openai.api_base = azure_endpoint
@@ -15,7 +17,7 @@ openai.api_version = api_version
 openai.api_key = api_key
 
 # Load the UAE Real Estate dataset
-dataset_url = "/content/sample_data/uae_real_estate_2024.csv"
+dataset_url = "uae_real_estate_2024.csv"
 dataset = pd.read_csv(dataset_url)
 
 # Strip spaces from column names to avoid issues
@@ -53,11 +55,10 @@ def extract_attributes(query):
     elif re.search(r'(\d+)\s*(AED|dirhams)?\s*or\s*less', query, re.IGNORECASE):
         attributes['price_max'] = int(re.search(r'(\d+)\s*(AED|dirhams)?\s*or\s*less', query, re.IGNORECASE).group(1))
 
-    # Extract city or location dynamically
-    # Get the city mentioned in the query
-    city_match = re.search(r'(dubai|abu dhabi|sharjah|ajman|ras al khaimah|fujairah|umm al quwain)', query, re.IGNORECASE)
-    if city_match:
-        attributes['displayAddress'] = city_match.group(0).capitalize()  # Get the first match and capitalize it
+    # Extract location similar to other entities
+    location_match = re.search(r'\b(?:in|at|near)\s+(\w+(?:\s+\w+)*)', query, re.IGNORECASE)
+    if location_match:
+        attributes['displayAddress'] = location_match.group(1).strip()
 
     return attributes
 
@@ -65,67 +66,149 @@ def extract_attributes(query):
 # Function to search properties in the dataset
 def search_properties(attributes, dataset):
     filtered_properties = dataset
-    
+
     # Filter by bedrooms
     if attributes['bedrooms']:
         filtered_properties = filtered_properties[
             filtered_properties['bedrooms'].astype(str).str.contains(str(attributes['bedrooms']), case=False, na=False)
         ]
-    
+
     # Filter by bathrooms
     if attributes['bathrooms']:
         filtered_properties = filtered_properties[
             filtered_properties['bathrooms'].astype(str).str.contains(str(attributes['bathrooms']), case=False, na=False)
         ]
-    
+
     # Filter by location (city)
     if attributes['displayAddress']:
         filtered_properties = filtered_properties[
             filtered_properties['displayAddress'].str.contains(attributes['displayAddress'], case=False, na=False)
         ]
-    
+
     # Filter by price (if max price is specified)
     if attributes['price_max']:
         filtered_properties = filtered_properties[
             filtered_properties['price'].astype(int) <= attributes['price_max']
         ]
-    
+
     return filtered_properties
 
-# Format the output for a better user-friendly display
+# Format the output for a more organized display with numbered listings
 def format_properties(properties, max_results=5):
     if properties.empty:
         return "Sorry, no properties match your criteria."
-
+    
+    response = ""
+    
     # Limit the number of results displayed
     properties = properties.head(max_results)
 
-    # Creating a user-friendly summary for each property
-    result = ""
-    for index, row in properties.iterrows():
-        result += f"\nProperty {index + 1}:\n"
-        result += f"Location: {row['displayAddress']}\n"
-        result += f"Price: {row['price']} AED\n"
-        result += f"Size: {row['sizeMin']} sq ft\n"
-        result += f"Bedrooms: {row['bedrooms']}\n"
-        result += f"Bathrooms: {row['bathrooms']}\n"
-        result += f"Furnishing: {row['furnishing']}\n"
-        result += "-" * 20
+    # Create a more organized and readable output
+    for idx, row in properties.iterrows():
+        response += f"Location: {row['displayAddress']}\n"
+        response += f"Price: {row['price']} AED\n"
+        response += f"Size: {row['sizeMin']} sq ft\n"  # Correct the size unit
+        response += f"Bedrooms: {row['bedrooms']}\n"
+        response += f"Bathrooms: {row['bathrooms']}\n"
+        response += f"Furnishing: {row['furnishing']}\n\n"
     
-    # Indicate if there are more results
-    if len(properties) == max_results:
-        result += "\n... (more results available)"
-    
-    return result
+    return response
 
-# Handle user input and fetch real estate info
-def handle_query(query):
+
+
+
+
+# Function to handle chat history
+def handle_query(query, chat_history):
     user_attributes = extract_attributes(query)
     matching_properties = search_properties(user_attributes, dataset)
-    
-    return format_properties(matching_properties)
+    response = format_properties(matching_properties)
 
-# Example user query (user can enter this freely)
-user_query = input("Enter your query: ")
-response = handle_query(user_query)
-print(response)
+    chat_history.append(f"You: {query}")
+    chat_history.append(f"Bot: {response}")
+    return chat_history
+
+# Initialize chat history
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
+
+# Custom CSS to fix the text box and send button at the bottom
+st.markdown("""
+    <style>
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+            padding-bottom: 60px;  /* space for the fixed input and button */
+        }
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        .user-message {
+            background-color: #FFFFFF;
+            color: black;
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        .bot-message {
+            background-color: #D3D3D3;
+            color: black;
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        .input-container {
+            display: flex;
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            background-color: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .input-box {
+            flex-grow: 1;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+        .send-button {
+            margin-left: 10px;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+# Display chat history
+st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+st.markdown('<div class="chat-messages">', unsafe_allow_html=True)
+
+for message in st.session_state.chat_history:
+    if message.startswith("You:"):
+        st.markdown(f'<div class="user-message">{message[4:]}</div>', unsafe_allow_html=True)
+    else:
+        st.markdown(f'<div class="bot-message">{message[4:]}</div>', unsafe_allow_html=True)
+
+st.markdown('</div>', unsafe_allow_html=True)
+
+# Display input field and send button
+with st.form(key="chat_form", clear_on_submit=True):
+    user_input = st.text_input("Enter your message:", key="user_input_field", label_visibility="collapsed")
+    submit_button = st.form_submit_button("Send", type="primary")
+
+    if submit_button and user_input:
+        st.session_state.chat_history = handle_query(user_input, st.session_state.chat_history)
+
+st.markdown('</div>', unsafe_allow_html=True)
