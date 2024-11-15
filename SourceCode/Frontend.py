@@ -4,6 +4,7 @@ from data_processing import load_dataset
 from attribute_extraction import extract_attributes
 from property_filter import search_properties
 from property_formatting import format_properties
+from main import query_properties
 
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
@@ -77,21 +78,18 @@ def display_chat():
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-
-
 def handle_user_input():
     with st.form(key="chat_form", clear_on_submit=True):
         user_input = st.text_input("Enter your message:", key="user_input_field", label_visibility="collapsed")
         submit_button = st.form_submit_button("Send", type="primary")
 
         if submit_button and user_input:
-            st.session_state.chat_history.append(f"You: {user_input}")
-            
-            user_attributes = extract_attributes(user_input)
-            matching_properties = search_properties(user_attributes, st.session_state.dataset)
-            response = format_properties(matching_properties)
-
+            response = query_properties(user_input)
+          #  st.session_state.chat_history.append(f"You: {user_input}")
+           # user_attributes = extract_attributes(user_input)
+           # matching_properties = search_properties(user_attributes, st.session_state.dataset)
+           # response = format_properties(matching_properties)
             st.session_state.chat_history.append(f"Bot: {response}")
-            display_chat()
 
+display_chat()
 handle_user_input()
