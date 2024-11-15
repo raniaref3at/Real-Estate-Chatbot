@@ -1,4 +1,4 @@
-##Real Estate Chatbot 
+## Real Estate Chatbot 
 Overview
 This chatbot provides users with a quick, AI-powered search experience for real estate properties. It processes natural language queries (e.g., "2-bedroom in Dubai Marina under 500,000 AED") and retrieves relevant property data based on user criteria such as location, price, bedroom/bathroom count, and furnishing options.
 
