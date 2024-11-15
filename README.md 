@@ -1,36 +1,67 @@
-Overview:
-This chatbot provides a user-friendly interface to search for real estate properties in the UAE. It allows users to filter properties by attributes such as the number of bedrooms, bathrooms, price range, and location, using natural language input.
+Real Estate Chatbot 
+Overview
+This chatbot provides users with a quick, AI-powered search experience for real estate properties. It processes natural language queries (e.g., "2-bedroom in Dubai Marina under 500,000 AED") and retrieves relevant property data based on user criteria such as location, price, bedroom/bathroom count, and furnishing options.
 
 Setup
-Install dependencies: Ensure you have the necessary libraries installed:
+Prerequisites
 
+Python 3.x
+Required packages: pandas, openai
+OpenAI Azure API key and endpoint
+Configuration
+
+Place api_key, azure_endpoint, api_version, and model information in a configuration file or modify them directly in the script.
+Set the dataset_url to the path of the CSV file containing real estate data.
+Installation
+
+Install required packages:
 bash
 Copy code
-pip install openai pandas streamlit
-Dataset: The chatbot works with the dataset uae_real_estate_2024.csv. Ensure the dataset is in the correct path.
+pip install pandas openai
+Data File
+Ensure that the dataset CSV (uae_real_estate_2024.csv) follows this structure:
 
-API Setup: The chatbot uses Azure OpenAI for querying. Set up your api_key, azure_endpoint, and other configurations in the RealEstateChatBotApi.py.
-
-Functionality
-Extract Attributes:
-The extract_attributes() function processes user input and extracts key attributes such as bedrooms, bathrooms, price, and location.
-
-Search Properties:
-The search_properties() function filters the dataset based on the extracted attributes and returns a list of properties that match the criteria.
-
-Format Results:
-The format_properties() function formats the matched properties for easy display.
-
-Streamlit UI:
-The interface uses Streamlit to display a chat interface, allowing users to interact with the chatbot. The user can enter queries, and the bot responds with filtered property suggestions.
-
+Columns: displayAddress, price, sizeMin, bedrooms, bathrooms, furnishing
+Place the dataset file in the root directory or specify the correct path in dataset_url.
 Usage
-User Interaction:
-The user enters a query, and the chatbot processes it to extract attributes. It then filters the dataset and displays matching properties.
+Initializing Chatbot
 
-Search Example:
-A user might ask, "Show me 2-bedroom apartments in Dubai under 1 million AED," and the bot will return properties that meet the criteria.
+Load the dataset using load_dataset() to make property data available for queries.
+Querying Properties
 
-Customization
-You can modify the attribute extraction logic in RealEstateChatBotApi.py for more complex queries.
-The format_properties() function can be customized to display additional property details or change the response format.
+Use query_properties(query) with a natural language string like:
+python
+Copy code
+query_properties("Looking for a furnished 2-bedroom apartment in Dubai Marina under 700,000 AED.")
+Example Workflow
+
+python
+Copy code
+dataset = load_dataset()  
+result = query_properties("3-bedroom in Downtown Dubai under 1,000,000 AED")
+print(result)
+Functionality
+Natural Language Processing (extract_attributes): Extracts user-requested attributes like bedrooms, price, and location using regex patterns.
+
+Property Filtering (search_properties): Filters dataset by attributes such as price range, bedroom/bathroom count, and location.
+
+Output Formatting (format_properties_for_openai): Formats properties into a user-friendly text, listing details for each matching property.
+
+OpenAI API Call (query_properties_with_openai): Sends the formatted message to OpenAI's GPT model to generate a response that summarizes search results in conversational language.
+
+Key Functions
+extract_attributes(query): Parses user’s query to extract search criteria.
+search_properties(attributes, dataset): Filters the dataset based on extracted attributes.
+format_openai_query(query, top_results): Structures messages for the OpenAI chat completion.
+query_properties_with_openai(query, dataset): Combines all steps, sending results to OpenAI to generate the final user-facing response.
+Example Output
+If a user asks for a “furnished 2-bedroom apartment in Dubai Marina under 500,000 AED,” the chatbot might respond:
+
+“Here are some matching properties in Dubai Marina:
+Property 1: Location: Dubai Marina, Price: 450,000 AED, Size: 1200 sq ft, Bedrooms: 2, Bathrooms: 1, Furnishing: Furnished.”
+
+Troubleshooting
+API Errors: Ensure correct API key and endpoint.
+Dataset Errors: Confirm CSV formatting and column names.
+Regex Matching Issues: Customize regex patterns in attribute extraction functions if certain query formats are not recognized.
+This documentation should guide you in using, modifying, and troubleshooting the real estate chatbot effectively.
