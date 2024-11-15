@@ -52,19 +52,19 @@ OpenAI API Call (query_properties_with_openai): Sends the formatted message to O
 # Run the Code
 Set the Azure OpenAI API Key: Open a terminal and set your Azure OpenAI API key as an environment variable. Use the following command (replace the example key with your actual API key):
 
-bash
+
 export AZURE_OPENAI_API_KEY="your_actual_api_key"
 To confirm that the key is set correctly, you can run:
 
-bash
+
 echo $AZURE_OPENAI_API_KEY
 Navigate to the Project Directory: Change your working directory to the folder containing the code files:
 
-bash
+
 cd /path/to/your/Real-Estate-Chatbot/SourceCode
 Run the Application: Use Streamlit to run the frontend:
 
-bash
+
 streamlit run frontend.py
 Access the Application: Once Streamlit starts the server, it will display a URL in the terminal. Open the URL in a web browser to use the chatbot.
 
