@@ -21,12 +21,7 @@ def query_properties_with_openai(query, dataset):
 
     top_results = format_properties_for_openai(matching_properties)
 
-    messages = [
-        {"role": "system", "content": "You are a helpful real estate assistant."},
-        {"role": "user", "content": f"User query: '{query}'"},
-        {"role": "assistant", "content": f"Matching properties:\n{top_results}"},
-        {"role": "user", "content": "Generate a user-friendly response summarizing these results."}
-    ]
+    messages = format_openai_query(query, top_results)
 
     response = openai.ChatCompletion.create(
         engine=model,
@@ -36,6 +31,16 @@ def query_properties_with_openai(query, dataset):
     )
 
     return response['choices'][0]['message']['content'].strip()
+
+def format_openai_query(query, top_results):
+    messages = [
+        {"role": "system", "content": "You are a helpful real estate assistant."},
+        {"role": "user", "content": f"User query: '{query}'"},
+        {"role": "assistant", "content": f"Matching properties:\n{top_results}"},
+        {"role": "user", "content": "Generate a user-friendly response summarizing these results."}
+    ]
+    
+    return messages
 
 def format_properties_for_openai(properties, max_results=5):
     properties = properties.head(max_results)
